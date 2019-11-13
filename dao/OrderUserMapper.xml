@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huazi.mybatis.dao.OrderUserMapper">
+	<select id="findUserById" parameterType="int" resultType="User">
+		select * from user where uid = #{uid}
+	</select>
+	<select id="findOrder" resultType="Order">
+		SELECT*FROM `order`
+	</select>
+	<resultMap type="User" id="findUserResultMap">
+		<id column="uid" property="uid"/>
+		<result column="username" property="username"></result>
+		<result column="birthday" property="birthday"></result>
+		<result column="sex" property="sex"></result>
+		<result column="address" property="address"></result>
+	</resultMap>
+	<resultMap type="Order" id="findOrderResultMap">
+		<id column="oid" property="oid"/>
+		<result column="user_id" property="userId"></result>
+		<result column="number" property="number"></result>
+		<result column="createtime" property="createtime"></result>
+		<result column="note" property="note"></result>
+	</resultMap>
+	<resultMap type="Items" id="findItemsResultMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name"></result>
+		<result column="price" property="price"></result>
+		<result column="detail" property="detail"></result>
+		<result column="pic" property="pic"></result>
+		<result column="createtime" property="createtime"></result>
+	</resultMap>
+	<resultMap type="Orderdetail" id="findOrderdetailResultMap">
+		<id column="odid" property="odid"/>
+		<result column="order_id" property="orderId"></result>
+		<result column="items_id" property="itemsId"></result>
+		<result column="items_num" property="itemsNum"></result>
+	</resultMap>
+	<sql id="sql_query_where">
+		<!-- <if test="User!=null"> -->
+			<if test="username!=null and username!=''">
+				and username=#{username}
+			</if>
+			
+		<!-- </if> -->
+	</sql>
+	<select id="findUserBySexAndName" parameterType="User" resultType="User">
+	select * from `user`
+	<where>
+		<include refid="sql_query_where"></include>
+	</where>
+	</select>
+	
+	<resultMap type="Order" id="orderDetailResultMap" extends="findOrderResultMap">
+		<!-- 有了继承相当于order表和user表的对应关系已经有了 -->
+		<!-- 只需要关联orderdetail表即可，一对多 -->
+		<result column="user_id" property="userId"></result>
+		<collection property="orderdetails" ofType="Orderdetail" autoMapping="true">
+			<result column="order_id" property="orderId"></result>
+			<result column="items_id" property="itemsId"></result>
+			<result column="items_num" property="itemsNum"></result>
+		</collection>
+		<collection property="user" ofType="User" autoMapping="true">
+		</collection>
+	</resultMap>
+	<select id="findOrderDetail" resultMap="orderDetailResultMap">
+		select o.*,u.*,od.* from `order` o,`user` u,orderdetail od where o.user_id=u.uid and o.oid=od.order_id
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
